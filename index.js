@@ -2,12 +2,10 @@ var grunt = require('grunt')
 var fs = require('fs')
 
 module.exports = function (opts) {
-  try{
-    require(opts.cwd + '/Gruntfile')(grunt)
+  var all = require(opts.root + '/static/task.json')
   
-    var all = require(opts.root + '/static/task.json')
-
-    require(opts.cwd + '/gulpfile')
+  if (fs.existsSync(opts.cwd + '/Gruntfile.js')) {
+    require(opts.cwd + '/Gruntfile')(grunt)
 
     var _tasks = Object.keys(grunt.task._tasks).sort();
   
@@ -20,10 +18,9 @@ module.exports = function (opts) {
     }
 
     fs.writeFileSync(opts.root + '/static/task.json',  JSON.stringify(all, null, 4))
-  }
-  catch(err)
-  {
-    //在此处理错误
-    console.log(err)
+  } else {
+    delete all.tasks.grunt
+    
+    fs.writeFileSync(opts.root + '/static/task.json',  JSON.stringify(all, null, 4))
   }
 }
